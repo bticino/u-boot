@@ -49,6 +49,40 @@ int mmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 	return mmc->send_cmd(mmc, cmd, data);
 }
 
+int mmc_send_status(struct mmc *mmc, int timeout)
+{
+	struct mmc_cmd cmd;
+	int err;
+	int status;
+
+	cmd.cmdidx = MMC_CMD_SEND_STATUS;
+	cmd.resp_type = MMC_RSP_R1;
+	cmd.cmdarg = 0;
+	cmd.flags = 0;
+
+	do {
+		err = mmc_send_cmd(mmc, &cmd, NULL);
+		if (err)
+			return err;
+		else if (cmd.response[0] & MMC_STATUS_RDY_FOR_DATA)
+			break;
+
+		udelay(1000);
+
+		if (cmd.response[0] & MMC_STATUS_MASK) {
+			printf("Status Error: 0x%08X\n", cmd.response[0]);
+			return COMM_ERR;
+		}
+	} while (timeout--);
+
+	if (!timeout) {
+		printf("Timeout waiting card ready\n");
+		return TIMEOUT;
+	}
+
+	return 0;
+}
+
 int mmc_set_blocklen(struct mmc *mmc, int len)
 {
 	struct mmc_cmd cmd;
@@ -83,6 +117,7 @@ mmc_write_blocks(struct mmc *mmc, ulong start, lbaint_t blkcnt, const void*src)
 {
 	struct mmc_cmd cmd;
 	struct mmc_data data;
+	int timeout = 1000;
 
 	if ((start + blkcnt) > mmc->block_dev.lba) {
 		printf("MMC: block number 0x%lx exceeds max(0x%lx)\n",
@@ -122,6 +157,9 @@ mmc_write_blocks(struct mmc *mmc, ulong start, lbaint_t blkcnt, const void*src)
 			printf("mmc fail to send stop cmd\n");
 			return 0;
 		}
+
+		/* Waiting for the ready status */
+		mmc_send_status(mmc, 1000);
 	}
 
 	return blkcnt;
@@ -159,6 +197,7 @@ int mmc_read_blocks(struct mmc *mmc, void *dst, ulong start, lbaint_t blkcnt)
 {
 	struct mmc_cmd cmd;
 	struct mmc_data data;
+	int timeout = 1000;
 
 	if (blkcnt > 1)
 		cmd.cmdidx = MMC_CMD_READ_MULTIPLE_BLOCK;
@@ -190,6 +229,9 @@ int mmc_read_blocks(struct mmc *mmc, void *dst, ulong start, lbaint_t blkcnt)
 			printf("mmc fail to send stop cmd\n");
 			return 0;
 		}
+
+		/* Waiting for the ready status */
+		mmc_send_status(mmc, 1000);
 	}
 
 	return blkcnt;
@@ -370,15 +412,23 @@ int mmc_send_ext_csd(struct mmc *mmc, char *ext_csd)
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
 	struct mmc_cmd cmd;
+	int timeout = 1000;
+	int ret;
 
 	cmd.cmdidx = MMC_CMD_SWITCH;
 	cmd.resp_type = MMC_RSP_R1b;
 	cmd.cmdarg = (MMC_SWITCH_MODE_WRITE_BYTE << 24) |
-		(index << 16) |
-		(value << 8);
+				 (index << 16) |
+				 (value << 8);
 	cmd.flags = 0;
 
-	return mmc_send_cmd(mmc, &cmd, NULL);
+	ret = mmc_send_cmd(mmc, &cmd, NULL);
+
+	/* Waiting for the ready status */
+	mmc_send_status(mmc, 1000);
+
+	return ret;
+
 }
 
 int mmc_change_freq(struct mmc *mmc)
@@ -611,6 +661,7 @@ int mmc_startup(struct mmc *mmc)
 	u64 cmult, csize;
 	struct mmc_cmd cmd;
 	char ext_csd[512];
+	int timeout = 1000;
 
 	/* Put the Card in Identify Mode */
 	cmd.cmdidx = MMC_CMD_ALL_SEND_CID;
@@ -722,6 +773,9 @@ int mmc_startup(struct mmc *mmc)
 	cmd.cmdarg = mmc->rca << 16;
 	cmd.flags = 0;
 	err = mmc_send_cmd(mmc, &cmd, NULL);
+
+	/* Waiting for the ready status */
+	mmc_send_status(mmc, 1000);
 
 	if (err)
 		return err;

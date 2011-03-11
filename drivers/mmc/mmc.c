@@ -46,7 +46,60 @@ int board_mmc_getcd(u8 *cd, struct mmc *mmc)__attribute__((weak,
 
 int mmc_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 {
+#ifdef CONFIG_MMC_TRACE
+	int ret;
+	int i;
+	u8 *ptr;
+
+	printf("CMD_SEND:%d\n", cmd->cmdidx);
+	printf("\t\tARG\t\t\t 0x%08X\n", cmd->cmdarg);
+	printf("\t\tFLAG\t\t\t %d\n", cmd->flags);
+	ret = mmc->send_cmd(mmc, cmd, data);
+	switch (cmd->resp_type) {
+		case MMC_RSP_NONE:
+			printf("\t\tMMC_RSP_NONE\n");
+			break;
+		case MMC_RSP_R1:
+			printf("\t\tMMC_RSP_R1,5,6,7 \t 0x%08X \n",
+				cmd->response[0]);
+			break;
+		case MMC_RSP_R1b:
+			printf("\t\tMMC_RSP_R1b\t\t 0x%08X \n",
+				cmd->response[0]);
+			break;
+		case MMC_RSP_R2:
+			printf("\t\tMMC_RSP_R2\t\t 0x%08X \n",
+				cmd->response[0]);
+			printf("\t\t          \t\t 0x%08X \n",
+				cmd->response[1]);
+			printf("\t\t          \t\t 0x%08X \n",
+				cmd->response[2]);
+			printf("\t\t          \t\t 0x%08X \n",
+				cmd->response[3]);
+			printf("\n");
+			printf("\t\t\t\t\tDUMPING DATA\n");
+			for (i = 0; i < 4; i++) {
+				int j;
+				printf("\t\t\t\t\t%03d - ", i*4);
+				ptr = &cmd->response[i];
+				ptr += 3;
+				for (j = 0; j < 4; j++)
+					printf("%02X ", *ptr--);
+				printf("\n");
+			}
+			break;
+		case MMC_RSP_R3:
+			printf("\t\tMMC_RSP_R3,4\t\t 0x%08X \n",
+				cmd->response[0]);
+			break;
+		default:
+			printf("\t\tERROR MMC rsp not supported\n");
+			break;
+	}
+	return ret;
+#else
 	return mmc->send_cmd(mmc, cmd, data);
+#endif
 }
 
 int mmc_send_status(struct mmc *mmc, int timeout)
@@ -75,6 +128,10 @@ int mmc_send_status(struct mmc *mmc, int timeout)
 		}
 	} while (timeout--);
 
+#ifdef CONFIG_MMC_TRACE
+	status = (cmd.response[0] & MMC_STATUS_CURR_STATE) >> 9;
+	printf("CURR STATE:%d\n", status);
+#endif
 	if (!timeout) {
 		printf("Timeout waiting card ready\n");
 		return TIMEOUT;
@@ -419,6 +476,20 @@ int mmc_send_ext_csd(struct mmc *mmc, char *ext_csd)
 	data.flags = MMC_DATA_READ;
 
 	err = mmc_send_cmd(mmc, &cmd, &data);
+#if MMC_DEBUG
+	{
+		int i;
+		printf("mmc_send_ext_csd: dumping data\n");
+		for (i=0; i<32;i++) {
+			int j;
+			printf("%03d - ", i*16);
+			for (j=0; j<16;j++)
+				printf("%02X ", data.dest[j+i*16]);
+			printf("\n");
+		}
+	}
+#endif
+
 
 	return err;
 }

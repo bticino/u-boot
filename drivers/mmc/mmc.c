@@ -409,7 +409,7 @@ sd_send_op_cond(struct mmc *mmc)
 
 int mmc_send_op_cond(struct mmc *mmc)
 {
-	int timeout = 10000;
+	int timeout = 100000;
 	struct mmc_cmd cmd;
 	int err;
 
@@ -434,7 +434,8 @@ int mmc_send_op_cond(struct mmc *mmc)
 		cmd.resp_type = MMC_RSP_R3;
 		cmd.cmdarg = ((mmc->voltages &
 			      (cmd.response[0] & OCR_VOLTAGE_MASK)) |
-			      (cmd.response[0] & OCR_ACCESS_MODE));
+			      (cmd.response[0] & OCR_ACCESS_MODE)) |
+			      0x40300000;
 		cmd.flags = 0;
 
 		err = mmc_send_cmd(mmc, &cmd, NULL);

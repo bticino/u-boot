@@ -941,8 +941,9 @@ int mmc_startup(struct mmc *mmc)
 				mmc_set_clock(mmc, 52000000);
 			else
 				mmc_set_clock(mmc, 26000000);
-		} else
-			mmc_set_clock(mmc, 20000000);
+		} else {
+			mmc_set_clock(mmc, 50000000);
+		}
 	}
 
 	/* fill in device description */

@@ -32,6 +32,10 @@
 #define CONFIG_SYS_CONSOLE_INFO_QUIET
 #define	CONFIG_DISPLAY_CPUINFO
 
+/* Watchdog */
+#define CONFIG_WATCHDOG
+#define CONFIG_SYS_WATCHDOG_VALUE      (5 * 60)
+
 /* SoC Configuration */
 #define CONFIG_ARM926EJS				/* arm926ejs CPU */
 #define CONFIG_SYS_TIMERBASE		0x01c21400	/* use timer 0 */

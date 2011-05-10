@@ -24,6 +24,7 @@
 #define DAVINCI_DINGO
 
 #define CONFIG_WATCHDOG
+#define CONFIG_SYS_WATCHDOG_VALUE (5 * 60)
 
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is a 3rd stage loader */
 #define CONFIG_SYS_NO_FLASH		/* that is, no *NOR* flash */

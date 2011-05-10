@@ -84,9 +84,8 @@ static void phy_off(void)
 int musb_platform_init(void)
 {
 	u32  revision;
-
 	/* enable USB VBUS */
-#ifndef DAVINCI_DM365EVM
+#if !defined(DAVINCI_DM365EVM) && !defined(DAVINCI_BASI)
 	enable_vbus();
 #endif
 	/* start the on-chip USB phy and its pll */

@@ -111,7 +111,6 @@ int board_nand_init(struct nand_chip *nand)
 static struct davinci_mmc mmc_sd0 = {
 	.reg_base = (struct davinci_mmc_regs *)DAVINCI_MMC_SD0_BASE,
 	.input_clk = 121500000,
-	.host_caps = MMC_MODE_4BIT,
 	.voltages = MMC_VDD_32_33 | MMC_VDD_33_34,
 	.version = MMC_CTLR_VERSION_2,
 };
@@ -120,7 +119,6 @@ static struct davinci_mmc mmc_sd0 = {
 static struct davinci_mmc mmc_sd1 = {
 	.reg_base = (struct davinci_mmc_regs *)DAVINCI_MMC_SD1_BASE,
 	.input_clk = 121500000,
-	.host_caps = MMC_MODE_4BIT,
 	.voltages = MMC_VDD_32_33 | MMC_VDD_33_34,
 	.version = MMC_CTLR_VERSION_2,
 };
@@ -129,6 +127,18 @@ static struct davinci_mmc mmc_sd1 = {
 int board_mmc_init(bd_t *bis)
 {
 	int err;
+	struct davinci_gpio *gpio23_base =
+			(struct davinci_gpio *)DAVINCI_GPIO_BANK23;
+
+	/* GIO42 (~eMMC_RESET) pinmux setting */
+	writel((readl(PINMUX4) & 0x3FFFFFFF), PINMUX4);
+
+	/* set GIO42 (~eMMC_RESET) output */
+	writel((readl(&gpio23_base->dir) & ~(1 << 10)), &gpio23_base->dir);
+
+	/* GIO42 (~eMMC_RESET) output High */
+	writel((readl(&gpio23_base->set_data) | (1 << 10)),
+						&gpio23_base->set_data);
 
 	/* Add slot-0 to mmc subsystem */
 	err = davinci_mmc_init(bis, &mmc_sd0);

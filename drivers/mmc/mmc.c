@@ -913,6 +913,7 @@ int mmc_startup(struct mmc *mmc)
 			mmc_set_clock(mmc, 25000000);
 	} else {
 		if (mmc->card_caps & MMC_MODE_4BIT) {
+			printf("eMMC: 4bit\n");
 			/* Set the card to use 4 bit*/
 			err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL,
 					EXT_CSD_BUS_WIDTH,
@@ -940,6 +941,7 @@ int mmc_startup(struct mmc *mmc)
 			else
 				mmc_set_clock(mmc, 26000000);
 		} else {
+			printf("eMMC: speed 50Mhz\n");
 			mmc_set_clock(mmc, 50000000);
 		}
 	}
@@ -1026,20 +1028,11 @@ int mmc_init(struct mmc *mmc)
 	if (err)
 		return err;
 
-	/* Test for SD version 2 */
-	err = mmc_send_if_cond(mmc);
+	err = mmc_send_op_cond(mmc);
 
-	/* Now try to get the SD card's operating condition */
-	err = sd_send_op_cond(mmc);
-
-	/* If the command timed out, we check for an MMC card */
-	if (err == TIMEOUT) {
-		err = mmc_send_op_cond(mmc);
-
-		if (err) {
-			printf("Card did not respond to voltage select!\n");
-			return ENODEV;
-		}
+	if (err) {
+		printf("Card did not respond to voltage select!\n");
+		return ENODEV;
 	}
 
 	return mmc_startup(mmc);

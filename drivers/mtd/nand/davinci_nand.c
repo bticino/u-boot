@@ -57,6 +57,10 @@
 #define ECC_STATE_ERR_CORR_COMP_P	0x2
 #define ECC_STATE_ERR_CORR_COMP_N	0x3
 
+#define ioread8_rep(p, d, c)      __raw_readsb(p, d, c)
+#define ioread16_rep(p, d, c)     __raw_readsw(p, d, c)
+#define ioread32_rep(p, d, c)     __raw_readsl(p, d, c)
+
 /*
  * Exploit the little endianness of the ARM to do multi-byte transfers
  * per device read. This can perform over twice as quickly as individual
@@ -68,45 +72,13 @@
 static void nand_davinci_read_buf(struct mtd_info *mtd, uint8_t *buf, int len)
 {
 	struct nand_chip *chip = mtd->priv;
-	const u32 *nand = chip->IO_ADDR_R;
 
-	/* Make sure that buf is 32 bit aligned */
-	if (((int)buf & 0x3) != 0) {
-		if (((int)buf & 0x1) != 0) {
-			if (len) {
-				*buf = readb(nand);
-				buf += 1;
-				len--;
-			}
-		}
-
-		if (((int)buf & 0x3) != 0) {
-			if (len >= 2) {
-				*(u16 *)buf = readw(nand);
-				buf += 2;
-				len -= 2;
-			}
-		}
-	}
-
-	/* copy aligned data */
-	while (len >= 4) {
-		*(u32 *)buf = __raw_readl(nand);
-		buf += 4;
-		len -= 4;
-	}
-
-	/* mop up any remaining bytes */
-	if (len) {
-		if (len >= 2) {
-			*(u16 *)buf = readw(nand);
-			buf += 2;
-			len -= 2;
-		}
-
-		if (len)
-			*buf = readb(nand);
-	}
+	if ((0x03 & ((unsigned)buf)) == 0 && (0x03 & len) == 0)
+		ioread32_rep(chip->IO_ADDR_R, buf, len >> 2);
+	else if ((0x01 & ((unsigned)buf)) == 0 && (0x01 & len) == 0)
+		ioread16_rep(chip->IO_ADDR_R, buf, len >> 1);
+	else
+		ioread8_rep(chip->IO_ADDR_R, buf, len);
 }
 
 static void nand_davinci_write_buf(struct mtd_info *mtd, const uint8_t *buf,

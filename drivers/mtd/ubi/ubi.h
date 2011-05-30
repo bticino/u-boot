@@ -58,14 +58,30 @@
 /* UBI name used for character devices, sysfs, etc */
 #define UBI_NAME_STR "ubi"
 
+
+#if UBI_DEBUG > 0
 /* Normal UBI messages */
 #define ubi_msg(fmt, ...) printk(KERN_NOTICE "UBI: " fmt "\n", ##__VA_ARGS__)
+#else
+#define ubi_msg(fmt, ...)
+#endif
+
+#if UBI_DEBUG > 1
 /* UBI warning messages */
 #define ubi_warn(fmt, ...) printk(KERN_WARNING "UBI warning: %s: " fmt "\n", \
 				  __func__, ##__VA_ARGS__)
+#else
+#define ubi_warn(fmt, ...)
+#endif
+
+#if UBI_DEBUG > 2
 /* UBI error messages */
 #define ubi_err(fmt, ...) printk(KERN_ERR "UBI error: %s: " fmt "\n", \
 				 __func__, ##__VA_ARGS__)
+#else
+#define ubi_err(fmt, ...)
+#endif
+
 
 /* Lowest number PEBs reserved for bad PEB handling */
 #define MIN_RESEVED_PEBS 2

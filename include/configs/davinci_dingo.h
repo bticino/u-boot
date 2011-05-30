@@ -33,7 +33,13 @@
 #define CONFIG_SYS_TEXT_BASE		0x81080000
 
 #define CONFIG_SYS_CONSOLE_INFO_QUIET
+#define CONFIG_SILENT_CONSOLE
+/* #define CONFIG_DISABLE_CONSOLE */
+/* #define CONFIG_DISABLE_PRINTK */
 #undef	CONFIG_DISPLAY_CPUINFO
+#undef CONFIG_DISPLAY_BOARDINFO
+
+#define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
 
 /* SoC Configuration */
 #define CONFIG_ARM926EJS				/* arm926ejs CPU */
@@ -48,6 +54,7 @@
 #define PHYS_SDRAM_1			0x80000000
 #define PHYS_SDRAM_1_SIZE		(128 << 20)	/* 128 MiB */
 #define CONFIG_MAX_RAM_BANK_SIZE	(256 << 20)	/* Max supported */
+#define DDR_4BANKS
 
 /* Serial Driver info: UART0 for console  */
 #define CONFIG_SYS_NS16550
@@ -71,10 +78,12 @@
 #define CONFIG_DRIVER_TI_EMAC
 #define CONFIG_EMAC_MDIO_PHY_NUM	0
 #define CONFIG_MII
-#define CONFIG_BOOTP_DEFAULT
+/*
+ #define CONFIG_BOOTP_DEFAULT
 #define CONFIG_BOOTP_DNS
 #define CONFIG_BOOTP_DNS2
 #define CONFIG_BOOTP_SEND_HOSTNAME
+*/
 #define CONFIG_NET_RETRY_COUNT	10
 #define CONFIG_NET_MULTI
 
@@ -96,7 +105,7 @@
 #define CONFIG_SYS_MMC_ENV_DEV		0
 #endif
 #define CONFIG_NAND_DAVINCI
-#define CONFIG_SYS_NAND_CS              1
+#define CONFIG_SYS_NAND_CS              2
 #define CONFIG_SYS_NAND_USE_FLASH_BBT
 #define CONFIG_SYS_NAND_4BIT_HW_ECC_OOBFIRST
 #define CONFIG_SYS_NAND_PAGE_2K
@@ -105,7 +114,7 @@
 #define CONFIG_SYS_NAND_BASE_LIST       { 0x02000000, }
 /* socket has two chipselects, nCE0 gated by address BIT(14) */
 #define CONFIG_SYS_MAX_NAND_DEVICE      1
-#define CONFIG_SYS_NAND_MAX_CHIPS       2
+#define CONFIG_SYS_NAND_MAX_CHIPS       1
 
 #define PINMUX4_USBDRVBUS_BITCLEAR       0x3000
 #define PINMUX4_USBDRVBUS_BITSET         0x2000
@@ -149,16 +158,13 @@
 /* U-Boot command configuration */
 #include <config_cmd_default.h>
 
-#undef CONFIG_CMD_BDI
-#undef CONFIG_CMD_FLASH
-#undef CONFIG_CMD_FPGA
-#undef CONFIG_CMD_SETGETDCR
-
+/*
 #define CONFIG_CMD_ASKENV
 #define CONFIG_CMD_DHCP
-// #define CONFIG_CMD_I2C
+#define CONFIG_CMD_I2C
 #define CONFIG_CMD_PING
 #define CONFIG_CMD_SAVES
+*/
 
 #ifdef CONFIG_MMC
 #define CONFIG_DOS_PARTITION
@@ -170,14 +176,22 @@
 #ifdef CONFIG_NAND_DAVINCI
 #define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_PARTITIONS
+#define CONFIG_SYS_NAND_ONFI_DETECTION
 #define CONFIG_MTD_DEVICE
+#undef CONFIG_MTD_DEBUG
+#define CONFIG_MTD_DEBUG_VERBOSE 0
 #define CONFIG_CMD_NAND
 #define CONFIG_CMD_UBI
+#define CONFIG_CMD_UBIFS
+#define UBI_DEBUG 0
+#define CONFIG_LZO
 #define CONFIG_RBTREE
 #endif
 
+/*
 #define CONFIG_CRC32_VERIFY
 #define CONFIG_MX_CYCLIC
+*/
 
 /* U-Boot general configuration */
 #undef CONFIG_USE_IRQ				/* No IRQ/FIQ in U-Boot */
@@ -186,15 +200,15 @@
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size  */
 #define CONFIG_SYS_PBSIZE			/* Print buffer size */ \
 		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
+#define CONFIG_SYS_MAXARGS	128		/* max number of command args */
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
-#define CONFIG_SYS_LONGHELP
+/* #define CONFIG_SYS_LONGHELP */
 
 #ifdef CONFIG_NAND_DAVINCI
-#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
+#define CONFIG_ENV_SIZE		(4 << 10)	/* 4 KiB */
 #define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET	0x3C0000
+#define CONFIG_ENV_OFFSET	0x180000
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
@@ -206,30 +220,30 @@
 #undef CONFIG_ENV_IS_IN_FLASH
 #endif
 
-#define CONFIG_BOOTDELAY	2
-#define CONFIG_BOOTCOMMAND	"ubi part root; ubifsmount root; ubifsload 81000000 /boot/uImage; bootm 81000000"
+#define CONFIG_BOOTDELAY	1
+#define CONFIG_BOOTCOMMAND	"ubi part kernel 2048; ubifsmount kernel; ubifsload 80700000 uImage; bootm"
 #define CONFIG_BOOTARGS \
 		"console=ttyS0,115200n8 " \
-		"ubi.mtd=1 root=ubi0:root rootfstype=ubifs ip=off" \
-		"video=davincifb:osd0=320x240x16,2025K@0,0:osd1=320x240,2025K@0,0:vid0=off:vid1=off" \
-		"davinci_enc_mngr.ch0_mode=NON-STANDARD davinci_enc_mngr.ch0_output=LCD"
-
+		"ubi.mtd=5,2048 root=ubi0:dingo-rootfs rootfstype=ubifs " \
+		"video=davincifb:osd0=320x240x16,2025K@0,0:osd1=320x240,2025K@0,0:vid0=off:vid1=off " \
+		"davinci_enc_mngr.ch0_mode=NON-STANDARD davinci_enc_mngr.ch0_output=LCD quiet lpj=671744"
+/*
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_VERSION_VARIABLE
 #define CONFIG_TIMESTAMP
+*/
 
 /* U-Boot memory configuration */
-#define CONFIG_STACKSIZE		(256 << 10)	/* 256 KiB */
-#define CONFIG_SYS_MALLOC_LEN		(1 << 20)	/* 1 MiB */
-#define CONFIG_SYS_MEMTEST_START	0x87000000	/* physical address */
-#define CONFIG_SYS_MEMTEST_END		0x88000000	/* test 16MB RAM */
+#define CONFIG_STACKSIZE               (256 << 10)     /* 256 KiB */
+#define CONFIG_SYS_MALLOC_LEN          (1 << 20)       /* 1 MiB */
+#define CONFIG_SYS_MEMTEST_START       0x87000000      /* physical address */
+#define CONFIG_SYS_MEMTEST_END         0x88000000      /* test 16MB RAM */
 
 /* Linux interfacing */
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_SYS_BARGSIZE	1024			/* bootarg Size */
-#define CONFIG_SYS_LOAD_ADDR	0x80700000		/* kernel address */
-
+#define CONFIG_SYS_BARGSIZE    1024                    /* bootarg Size */
+#define CONFIG_SYS_LOAD_ADDR   0x80700000              /* kernel address */
 
 /* NAND configuration issocketed with two chipselects just like the DM355 EVM.
  * It normally comes with a 2GByte SLC part with 2KB pages
@@ -242,17 +256,31 @@
 
 #ifdef CONFIG_SYS_NAND_LARGEPAGE
 /*  Use same layout for 128K/256K blocks; allow some bad blocks */
-#define PART_BOOT		"2m(bootloader)ro,"
+#define PART_BOOT		"1792k(bootloader)ro,"
 #else
 /* Assume 16K erase blocks; allow a few bad ones. */
 #define PART_BOOT		"512k(bootloader)ro,"
 #endif
 
-#define PART_KERNEL		"4m(kernel),"	/* kernel + initramfs */
-#define PART_REST		"-(filesystem)"
+#define PART_KERNEL_R		"8m(kernel_r),"	/* kernel + initramfs */
+#define PART_KERNEL_P		"8m(kernel),"	/* kernel + initramfs */
+#define PART_REST_R		"20m(fs_r),"
+#define PART_REST_P		"70m(fs_p),"
+#define PART_EXTRA		"-(extra)"
 
 #define MTDPARTS_DEFAULT	\
-	"mtdparts=davinci_nand.0:" PART_BOOT PART_KERNEL PART_REST
+	"mtdparts=davinci_nand.0:" PART_BOOT PART_KERNEL_R PART_REST_R PART_KERNEL_P PART_REST_P PART_EXTRA
+
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"verify=no" "\0" \
+	"silent=yes" "\0"
+
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_AUTOBOOT_KEYED
+#define CONFIG_AUTOBOOT_STOP_STR                "S"
+#define CONFIG_AUTOBOOT_PROMPT			"booting...\n"
 
 /* additions for new relocation code, must added to all boards */
 #define CONFIG_SYS_SDRAM_BASE		0x80000000

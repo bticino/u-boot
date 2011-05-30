@@ -169,7 +169,9 @@ static int read_bbt(struct mtd_info *mtd, uint8_t *buf, int page, int num,
 				if (tmp == msk)
 					continue;
 				if (reserved_block_code && (tmp == reserved_block_code)) {
-					printk(KERN_DEBUG "nand_read_bbt: Reserved block at 0x%012llx\n",
+					printk(KERN_DEBUG
+					"nand_read_bbt: "
+					"Reserved block at 0x%012llx\n",
 						(loff_t)((offs << 2) +
 						(act >> 1)) <<
 						this->bbt_erase_shift);
@@ -179,7 +181,8 @@ static int read_bbt(struct mtd_info *mtd, uint8_t *buf, int page, int num,
 				}
 				/* Leave it for now, if its matured we can move this
 				 * message to MTD_DEBUG_LEVEL0 */
-				printk(KERN_DEBUG "nand_read_bbt: Bad block at 0x%012llx\n",
+				MTDDEBUG(MTD_DEBUG_LEVEL0, "nand_read_bbt: "
+					"Bad block at 0x%012llx\n",
 					(loff_t)((offs << 2) + (act >> 1)) <<
 					this->bbt_erase_shift);
 				/* Factory marked bad or worn out ? */
@@ -376,7 +379,7 @@ static int create_bbt(struct mtd_info *mtd, uint8_t *buf,
 	loff_t from;
 	size_t readlen;
 
-	MTDDEBUG (MTD_DEBUG_LEVEL0, "Scanning device for bad blocks\n");
+	MTDDEBUG(MTD_DEBUG_LEVEL0, "Scanning device for bad blocks\n");
 
 	if (bd->options & NAND_BBT_SCANALLPAGES)
 		len = 1 << (this->bbt_erase_shift - this->page_shift);
@@ -429,7 +432,7 @@ static int create_bbt(struct mtd_info *mtd, uint8_t *buf,
 
 		if (ret) {
 			this->bbt[i >> 3] |= 0x03 << (i & 0x6);
-			MTDDEBUG (MTD_DEBUG_LEVEL0,
+			MTDDEBUG(MTD_DEBUG_LEVEL0,
 				  "Bad eraseblock %d at 0x%012llx\n",
 				  i >> 1, (unsigned long long)from);
 			mtd->ecc_stats.badblocks++;
@@ -514,10 +517,12 @@ static int search_bbt(struct mtd_info *mtd, uint8_t *buf, struct nand_bbt_descr 
 	/* Check, if we found a bbt for each requested chip */
 	for (i = 0; i < chips; i++) {
 		if (td->pages[i] == -1)
-			printk(KERN_WARNING "Bad block table not found for chip %d\n", i);
+			MTDDEBUG(MTD_DEBUG_LEVEL0, "Bad block table not found"
+							" for chip %d\\n", i);
 		else
-			printk(KERN_DEBUG "Bad block table found at page %d, version 0x%02X\n", td->pages[i],
-			       td->version[i]);
+			MTDDEBUG(MTD_DEBUG_LEVEL0, "d block table found at "
+				"page %d, version 0x%02X\n",
+				td->pages[i], td->version[i]);
 	}
 	return 0;
 }
@@ -1205,7 +1210,8 @@ int nand_isbad_bbt(struct mtd_info *mtd, loff_t offs, int allowbbt)
 	block = (int)(offs >> (this->bbt_erase_shift - 1));
 	res = (this->bbt[block >> 3] >> (block & 0x06)) & 0x03;
 
-	MTDDEBUG (MTD_DEBUG_LEVEL2, "nand_isbad_bbt(): bbt info for offs 0x%08x: "
+	MTDDEBUG(MTD_DEBUG_LEVEL2, "nand_isbad_bbt(): "
+		  "bbt info for offs 0x%08x: "
 	          "(block %d) 0x%02x\n", (unsigned int)offs, res, block >> 1);
 
 	switch ((int)res) {

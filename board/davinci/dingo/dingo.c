@@ -104,7 +104,7 @@ static void nand_davinci_select_chip(struct mtd_info *mtd, int chip)
 int board_nand_init(struct nand_chip *nand)
 {
 	davinci_nand_init(nand);
-	nand->select_chip = nand_davinci_select_chip;
+	nand->options |= NAND_SKIP_BBTSCAN;
 	return 0;
 }
 #endif

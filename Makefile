@@ -956,6 +956,9 @@ davinci_dm365evm_config :	unconfig
 davinci_basi_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm926ejs basi davinci davinci
 
+davinci_dingo_config :	unconfig
+	@$(MKCONFIG) $(@:_config=) arm arm926ejs dingo davinci davinci
+
 davinci_dm6467evm_config :	unconfig
 	@$(MKCONFIG) $(@:_config=) arm arm926ejs dm6467evm davinci davinci
 

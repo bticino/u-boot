@@ -160,13 +160,6 @@
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 #define CONFIG_SYS_LONGHELP
 
-#ifdef CONFIG_NAND_DAVINCI
-#define CONFIG_ENV_SIZE		(256 << 10)	/* 256 KiB */
-#define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_OFFSET	0x3C0000
-#undef CONFIG_ENV_IS_IN_FLASH
-#endif
-
 #if defined(CONFIG_MMC) && !defined(CONFIG_ENV_IS_IN_NAND)
 #define CONFIG_CMD_ENV
 #define CONFIG_ENV_SIZE		(4 << 10)	/* 4 KiB */
@@ -197,30 +190,6 @@
 #define CONFIG_SETUP_MEMORY_TAGS
 #define CONFIG_SYS_BARGSIZE	1024			/* bootarg Size */
 #define CONFIG_SYS_LOAD_ADDR	0x80700000		/* kernel address */
-
-
-/* NAND configuration issocketed with two chipselects just like the DM355 EVM.
- * It normally comes with a 2GByte SLC part with 2KB pages
- * (and 128KB erase blocks); other
- * 2GByte parts may have 4KB pages, 256KB erase blocks, and use MLC.  (MLC
- * pretty much demands the 4-bit ECC support.)  You can of course swap in
- * other parts, including small page ones.
- */
-#define MTDIDS_DEFAULT		"nand0=davinci_nand.0"
-
-#ifdef CONFIG_SYS_NAND_LARGEPAGE
-/*  Use same layout for 128K/256K blocks; allow some bad blocks */
-#define PART_BOOT		"2m(bootloader)ro,"
-#else
-/* Assume 16K erase blocks; allow a few bad ones. */
-#define PART_BOOT		"512k(bootloader)ro,"
-#endif
-
-#define PART_KERNEL		"4m(kernel),"	/* kernel + initramfs */
-#define PART_REST		"-(filesystem)"
-
-#define MTDPARTS_DEFAULT	\
-	"mtdparts=davinci_nand.0:" PART_BOOT PART_KERNEL PART_REST
 
 /* additions for new relocation code, must added to all boards */
 #define CONFIG_SYS_SDRAM_BASE		0x80000000

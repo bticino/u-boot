@@ -924,6 +924,7 @@ int mmc_startup(struct mmc *mmc)
 
 			mmc_set_bus_width(mmc, 4);
 		} else if (mmc->card_caps & MMC_MODE_8BIT) {
+			printf("eMMC: 8bit\n");
 			/* Set the card to use 8 bit*/
 			err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL,
 					EXT_CSD_BUS_WIDTH,
@@ -936,10 +937,14 @@ int mmc_startup(struct mmc *mmc)
 		}
 
 		if (mmc->card_caps & MMC_MODE_HS) {
-			if (mmc->card_caps & MMC_MODE_HS_52MHz)
+			printf("eMMC: MODE_HS\n");
+			if (mmc->card_caps & MMC_MODE_HS_52MHz) {
+				printf("eMMC: MODE_HS_52Mhz\n");
 				mmc_set_clock(mmc, 52000000);
-			else
+			} else {
+				printf("eMMC: MODE_HS 26Mhz\n");
 				mmc_set_clock(mmc, 26000000);
+			}
 		} else {
 			printf("eMMC: speed 50Mhz\n");
 			mmc_set_clock(mmc, 50000000);

@@ -42,6 +42,7 @@
 #define CONFIG_SYS_HZ_CLOCK		24000000	/* timer0 freq */
 #define CONFIG_SYS_HZ			1000
 #define CONFIG_SOC_DM365
+#define CONFIG_CMD_CACHE
 
 /* Memory Info */
 #define CONFIG_NR_DRAM_BANKS		1

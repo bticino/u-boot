@@ -84,9 +84,10 @@ int board_eth_init(bd_t *bis)
 
 static struct davinci_mmc mmc_sd0 = {
 	.reg_base = (struct davinci_mmc_regs *)DAVINCI_MMC_SD0_BASE,
-	.input_clk = 121500000,
+	.input_clk =  86000000,
 	.voltages = MMC_VDD_32_33 | MMC_VDD_33_34,
 	.version = MMC_CTLR_VERSION_2,
+	.host_caps = MMC_MODE_4BIT | MMC_MODE_HS | MMC_MODE_HS_52MHz,
 };
 
 int board_mmc_init(bd_t *bis)

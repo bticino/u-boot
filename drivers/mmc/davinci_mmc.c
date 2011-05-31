@@ -393,7 +393,7 @@ int davinci_mmc_init(bd_t *bis, struct davinci_mmc *host)
 	mmc->f_min = 200000;
 	mmc->f_max = 52000000;
 	mmc->voltages = host->voltages;
-	mmc->host_caps = host->host_caps | MMC_MODE_4BIT;
+	mmc->host_caps = host->host_caps | MMC_MODE_4BIT | MMC_MODE_HS_52MHz | MMC_MODE_HS;
 
 #ifdef CONFIG_MMC_MBLOCK
 	mmc->b_max = DAVINCI_MAX_BLOCKS;

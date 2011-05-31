@@ -176,6 +176,7 @@
 #endif
 
 #define CONFIG_BOOTDELAY	3
+#define CONFIG_ZERO_BOOTDELAY_CHECK
 #define CONFIG_BOOTCOMMAND	"if mmc rescan 0; then if fatload mmc 0 0x80600000 boot.scr; then source 0x80600000; else fatload mmc 0 0x80700000 uImage; bootm 80700000; fi; fi"
 #define CONFIG_BOOTARGS \
 		"console=ttyS0,115200n8 " \

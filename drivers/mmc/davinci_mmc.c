@@ -50,7 +50,10 @@ static void dmmc_set_clock(struct mmc *mmc, uint clock)
 	clkrt = (sysclk2 / (2 * clock)) - 1;
 
 	/* Calculate the actual clock for the divider used */
-	act_clock = (sysclk2 / (2 * (clkrt + 1)));
+	if (clkrt != -1)
+		act_clock = (sysclk2 / (2 * (clkrt + 1)));
+	else
+		act_clock = clock + 1;
 
 	/* Adjust divider if actual clock exceeds the required clock */
 	if (act_clock > clock)

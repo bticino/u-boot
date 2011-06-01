@@ -106,6 +106,13 @@ int board_mmc_init(bd_t *bis)
 	writel((readl(&gpio23_base->set_data) | (1 << 10)),
 						&gpio23_base->set_data);
 
+	/*
+	 * enabling cache make mmc read faster
+	 * but tftp doesn't work
+	 */
+	icache_enable ();
+	dcache_enable ();
+
 	/* Add slot-0 to mmc subsystem */
 	err = davinci_mmc_init(bis, &mmc_sd0);
 	if (err)

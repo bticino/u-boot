@@ -1210,7 +1210,7 @@ U_BOOT_CMD(
 #ifdef CONFIG_SILENT_CONSOLE
 static void fixup_silent_linux ()
 {
-	char buf[256], *start, *end;
+	char buf[512], *start, *end;
 	char *cmdline = getenv ("bootargs");
 
 	/* Only fix cmdline when requested */

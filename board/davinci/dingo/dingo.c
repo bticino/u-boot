@@ -23,6 +23,7 @@
 #include <asm/arch/emif_defs.h>
 #include <asm/arch/nand_defs.h>
 #include <asm/arch/gpio_defs.h>
+#include <net.h>
 #include <netdev.h>
 #include "../common/misc.h"
 #ifdef CONFIG_DAVINCI_MMC
@@ -32,6 +33,31 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+static inline char invert(char a)
+{
+	return ((a & 0x01) << 7) + ((a & 0x02) << 5) + ((a & 0x04) << 3)
+		+ ((a & 0x08) << 1) + ((a & 0x10) >> 1) + ((a & 0x20) >> 3)
+		+ ((a & 0x40) >> 5) + ((a & 0x80) >> 7);
+}
+
+static inline char low2(char a)
+{
+	return a & 0x3;
+}
+
+char board_rand(void)
+{
+	int a, b, c;
+	static int d;
+
+	a = readl(0x01c21814);
+	b = readl(0x01c21c10);
+
+	d += a;
+	c = d  + (invert(b)<<low2(a));
+	return (c + (c>>6)) & 0xFF;
+}
+
 int board_init(void)
 {
 	gd->bd->bi_arch_number = MACH_TYPE_DINGO;
@@ -40,13 +66,12 @@ int board_init(void)
 	return 0;
 }
 
-
 void enable_vbus(void)
 {}
 #ifdef CONFIG_DRIVER_TI_EMAC
 int board_eth_init(bd_t *bis)
 {
-	uint8_t eeprom_enetaddr[6];
+	unsigned char enetaddr[6];
 	int i;
 	struct davinci_gpio *gpio1_base =
 			(struct davinci_gpio *)DAVINCI_GPIO_BANK01;
@@ -54,28 +79,16 @@ int board_eth_init(bd_t *bis)
 	/* Configure PINMUX 3 to enable EMAC pins */
 	writel((readl(PINMUX3) | 0x1affff), PINMUX3);
 
-	/* Configure GPIO20 as output */
-	writel((readl(&gpio1_base->dir) & ~(1 << 20)), &gpio1_base->dir);
-
-	/* Toggle GPIO 20 */
-	for (i = 0; i < 20; i++) {
-		/* GPIO 20 low */
-		writel((readl(&gpio1_base->out_data) & ~(1 << 20)),
-						&gpio1_base->out_data);
-
-		udelay(1000);
-
-		/* GPIO 20 high */
-		writel((readl(&gpio1_base->out_data) | (1 << 20)),
-						&gpio1_base->out_data);
+	if (!eth_getenv_enetaddr("ethaddr", enetaddr)) {
+		enetaddr[0] = 0x00;
+		enetaddr[1] = 0x03;
+		enetaddr[2] = 0x50;
+		/* Generate random lower MAC half */
+		enetaddr[3] = board_rand();
+		enetaddr[4] = board_rand();
+		enetaddr[5] = board_rand();
+		eth_setenv_enetaddr("ethaddr", enetaddr);
 	}
-
-	/* Configure I2C pins so that EEPROM can be read */
-	writel((readl(PINMUX3) | 0x01400000), PINMUX3);
-
-	/* Read Ethernet MAC address from EEPROM */
-	if (dvevm_read_mac_address(eeprom_enetaddr))
-		davinci_sync_env_enetaddr(eeprom_enetaddr);
 
 	davinci_emac_initialize();
 

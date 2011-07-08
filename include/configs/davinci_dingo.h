@@ -29,17 +29,23 @@
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is a 3rd stage loader */
 #define CONFIG_SYS_NO_FLASH		/* that is, no *NOR* flash */
 
-#define CONFIG_ETHADDR			"00:30:50:11:22:33"
+/* #define CONFIG_ETHADDR			"00:30:50:11:22:33" */
+#define CONFIG_OVERWRITE_ETHADDR_ONCE
+
 #define CONFIG_SYS_TEXT_BASE		0x81080000
 
 #define CONFIG_SYS_CONSOLE_INFO_QUIET
 #define CONFIG_SILENT_CONSOLE
+#define CONFIG_SYS_DEVICE_NULLDEV
 /* #define CONFIG_DISABLE_CONSOLE */
 /* #define CONFIG_DISABLE_PRINTK */
-#undef	CONFIG_DISPLAY_CPUINFO
+#undef CONFIG_DISPLAY_CPUINFO
 #undef CONFIG_DISPLAY_BOARDINFO
 
 #define CONFIG_SYS_ARM_CACHE_WRITETHROUGH
+
+#define CONFIG_MII
+#define CONFIG_CMD_MII
 
 /* SoC Configuration */
 #define CONFIG_ARM926EJS				/* arm926ejs CPU */
@@ -79,7 +85,7 @@
 #define CONFIG_EMAC_MDIO_PHY_NUM	0
 #define CONFIG_MII
 /*
- #define CONFIG_BOOTP_DEFAULT
+#define CONFIG_BOOTP_DEFAULT
 #define CONFIG_BOOTP_DNS
 #define CONFIG_BOOTP_DNS2
 #define CONFIG_BOOTP_SEND_HOSTNAME
@@ -200,7 +206,7 @@
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O Buffer Size  */
 #define CONFIG_SYS_PBSIZE			/* Print buffer size */ \
 		(CONFIG_SYS_CBSIZE + sizeof(CONFIG_SYS_PROMPT) + 16)
-#define CONFIG_SYS_MAXARGS	128		/* max number of command args */
+#define CONFIG_SYS_MAXARGS	16		/* max number of command args */
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_SYS_PROMPT_HUSH_PS2	"> "
 /* #define CONFIG_SYS_LONGHELP */
@@ -221,7 +227,7 @@
 #endif
 
 #define CONFIG_BOOTDELAY	1
-#define CONFIG_BOOTCOMMAND	"ubi part kernel 2048; ubifsmount kernel; ubifsload 80700000 uImage; bootm"
+#define CONFIG_BOOTCOMMAND	"dcache on; icache on; ubi part kernel 2048; ubifsmount kernel; ubifsload 80700000 uImage; bootm"
 #define CONFIG_BOOTARGS \
 		"console=ttyS0,115200n8 " \
 		"ubi.mtd=5,2048 root=ubi0:dingo-rootfs rootfstype=ubifs " \

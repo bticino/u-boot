@@ -29,7 +29,16 @@
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is a 3rd stage loader */
 #define CONFIG_SYS_NO_FLASH		/* that is, no *NOR* flash */
 
-/* #define CONFIG_ETHADDR			"00:30:50:11:22:33" */
+#undef CONFIG_ETHADDR			/* For parallel production environment
+					 * a fixed MAC address is not good */
+#define CONFIG_RANDOM_DM365_ENETADDR	/* A Random MAC address is what we
+					 * want, with the first three bytes
+					 * configurable.
+					 */
+#define CONFIG_RANDOM_DM365_ENETADDR_ADDR1	0x00
+#define CONFIG_RANDOM_DM365_ENETADDR_ADDR2	0x03
+#define CONFIG_RANDOM_DM365_ENETADDR_ADDR3	0x50
+
 #define CONFIG_OVERWRITE_ETHADDR_ONCE
 
 #define CONFIG_SYS_TEXT_BASE		0x81080000

@@ -44,7 +44,12 @@
 #define CONFIG_SYS_TEXT_BASE 		0x81080000
 
 #define CONFIG_SYS_CONSOLE_INFO_QUIET
-#define	CONFIG_DISPLAY_CPUINFO
+#define CONFIG_SILENT_CONSOLE
+#define CONFIG_SYS_DEVICE_NULLDEV
+/* #define CONFIG_DISABLE_CONSOLE */
+/* #define CONFIG_DISABLE_PRINTK */
+#undef CONFIG_DISPLAY_CPUINFO
+#undef CONFIG_DISPLAY_BOARDINFO
 
 /* Watchdog */
 #define CONFIG_WATCHDOG
@@ -185,6 +190,9 @@
 
 #define CONFIG_BOOTDELAY	3
 #define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_AUTOBOOT_KEYED
+#define CONFIG_AUTOBOOT_STOP_STR                "S"
+
 #define CONFIG_BOOTCOMMAND	"if mmc rescan 0; then if fatload mmc 0 0x80600000 boot.scr; then source 0x80600000; else fatload mmc 0 0x80700000 uImage; bootm 80700000; fi; fi"
 #define CONFIG_BOOTARGS \
 		"console=ttyS0,115200n8 " \
@@ -199,6 +207,10 @@
 #define CONFIG_SYS_MALLOC_LEN		(1 << 20)	/* 1 MiB */
 #define CONFIG_SYS_MEMTEST_START	0x87000000	/* physical address */
 #define CONFIG_SYS_MEMTEST_END		0x88000000	/* test 16MB RAM */
+
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"verify=no" "\0" \
+	"silent=yes" "\0"
 
 /* Linux interfacing */
 #define CONFIG_CMDLINE_TAG

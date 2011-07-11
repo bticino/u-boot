@@ -106,7 +106,9 @@ int mmc_send_status(struct mmc *mmc, int timeout)
 {
 	struct mmc_cmd cmd;
 	int err;
+#ifdef CONFIG_MMC_TRACE
 	int status;
+#endif
 
 	cmd.cmdidx = MMC_CMD_SEND_STATUS;
 	cmd.resp_type = MMC_RSP_R1;
@@ -174,7 +176,6 @@ mmc_write_blocks(struct mmc *mmc, ulong start, lbaint_t blkcnt, const void*src)
 {
 	struct mmc_cmd cmd;
 	struct mmc_data data;
-	int timeout = 1000;
 
 	if ((start + blkcnt) > mmc->block_dev.lba) {
 		printf("MMC: block number 0x%lx exceeds max(0x%lx)\n",
@@ -254,7 +255,6 @@ int mmc_read_blocks(struct mmc *mmc, void *dst, ulong start, lbaint_t blkcnt)
 {
 	struct mmc_cmd cmd;
 	struct mmc_data data;
-	int timeout = 1000;
 
 	if (blkcnt > 1)
 		cmd.cmdidx = MMC_CMD_READ_MULTIPLE_BLOCK;
@@ -499,7 +499,6 @@ int mmc_send_ext_csd(struct mmc *mmc, char *ext_csd)
 int mmc_switch(struct mmc *mmc, u8 set, u8 index, u8 value)
 {
 	struct mmc_cmd cmd;
-	int timeout = 1000;
 	int ret;
 
 	cmd.cmdidx = MMC_CMD_SWITCH;
@@ -744,7 +743,6 @@ int mmc_startup(struct mmc *mmc)
 	u64 cmult, csize;
 	struct mmc_cmd cmd;
 	char ext_csd[512];
-	int timeout = 1000;
 
 	/* Put the Card in Identify Mode */
 	cmd.cmdidx = MMC_CMD_ALL_SEND_CID;

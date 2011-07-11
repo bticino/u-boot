@@ -75,6 +75,31 @@ err:
 	return 0;
 }
 
+static inline char invert(char a)
+{
+	return ((a & 0x01) << 7) + ((a & 0x02) << 5) + ((a & 0x04) << 3)
+		+ ((a & 0x08) << 1) + ((a & 0x10) >> 1) + ((a & 0x20) >> 3)
+		+ ((a & 0x40) >> 5) + ((a & 0x80) >> 7);
+}
+
+static inline char low2(char a)
+{
+	return a & 0x3;
+}
+
+char board_rand(void)
+{
+	int a, b, c;
+	static int d;
+
+	a = (int)get_ticks();
+	b = (int)get_ticks();
+
+	d += a;
+	c = d  + (invert(b)<<low2(a));
+	return (c + (c>>6)) & 0xFF;
+}
+
 /*
  * If there is no MAC address in the environment, then it will be initialized
  * (silently) from the value in the EEPROM.
@@ -85,12 +110,23 @@ void davinci_sync_env_enetaddr(uint8_t *rom_enetaddr)
 
 	eth_getenv_enetaddr_by_index(0, env_enetaddr);
 	if (!memcmp(env_enetaddr, "\0\0\0\0\0\0", 6)) {
+#ifdef CONFIG_RANDOM_DM365_ENETADDR
+		env_enetaddr[0] = CONFIG_RANDOM_DM365_ENETADDR_ADDR1;
+		env_enetaddr[1] = CONFIG_RANDOM_DM365_ENETADDR_ADDR2;
+		env_enetaddr[2] = CONFIG_RANDOM_DM365_ENETADDR_ADDR3;
+		/* Generate random lower MAC half */
+		env_enetaddr[3] = board_rand();
+		env_enetaddr[4] = board_rand();
+		env_enetaddr[5] = board_rand();
+		eth_setenv_enetaddr("ethaddr", env_enetaddr);
+#else
 		/* There is no MAC address in the environment, so we initialize
 		 * it from the value in the EEPROM. */
 		debug("### Setting environment from EEPROM MAC address = "
 			"\"%pM\"\n",
 			env_enetaddr);
 		eth_setenv_enetaddr("ethaddr", rom_enetaddr);
+#endif
 	}
 }
 

@@ -63,6 +63,10 @@ static void dmmc_set_clock(struct mmc *mmc, uint clock)
 	if (clkrt > 0xFF)
 		clkrt = 0xFF;
 
+#ifdef MMC_DEBUG
+	printf("eMMC clock =%lu\n", (sysclk2 / (2 * (clkrt + 1))));
+#endif
+
 	set_val(&regs->mmcclk, (clkrt | MMCCLK_CLKEN));
 }
 

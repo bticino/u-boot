@@ -43,36 +43,13 @@ int board_init(void)
 #ifdef CONFIG_DRIVER_TI_EMAC
 int board_eth_init(bd_t *bis)
 {
-	uint8_t eeprom_enetaddr[6];
-	int i;
-	struct davinci_gpio *gpio1_base =
-			(struct davinci_gpio *)DAVINCI_GPIO_BANK01;
+	uint8_t enetaddr[6];
 
 	/* Configure PINMUX 3 to enable EMAC pins */
 	writel((readl(PINMUX3) | 0x1affff), PINMUX3);
 
-	/* Configure GPIO20 as output */
-	writel((readl(&gpio1_base->dir) & ~(1 << 20)), &gpio1_base->dir);
-
-	/* Toggle GPIO 20 */
-	for (i = 0; i < 20; i++) {
-		/* GPIO 20 low */
-		writel((readl(&gpio1_base->out_data) & ~(1 << 20)),
-						&gpio1_base->out_data);
-
-		udelay(1000);
-
-		/* GPIO 20 high */
-		writel((readl(&gpio1_base->out_data) | (1 << 20)),
-						&gpio1_base->out_data);
-	}
-
-	/* Configure I2C pins so that EEPROM can be read */
-	writel((readl(PINMUX3) | 0x01400000), PINMUX3);
-
-	/* Read Ethernet MAC address from EEPROM */
-	if (dvevm_read_mac_address(eeprom_enetaddr))
-		davinci_sync_env_enetaddr(eeprom_enetaddr);
+	/* Using this function for setting a random mac address */
+	davinci_sync_env_enetaddr(enetaddr);
 
 	davinci_emac_initialize();
 

@@ -20,8 +20,12 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-/* Bticino basi board */
+/* Bticino Basi board */
 #define DAVINCI_BASI
+
+/* MMC debug support */
+/* #define CONFIG_MMC_TRACE */
+/* #define MMC_DEBUG 1 */
 
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* U-Boot is a 3rd stage loader */
 #define CONFIG_SYS_NO_FLASH		/* that is, no *NOR* flash */

@@ -553,7 +553,6 @@ int mmc_change_freq(struct mmc *mmc)
 	/* No high-speed support */
 	if (!ext_csd[185])
 		return 0;
-
 	/* High Speed is set, there are two types: 52MHz and 26MHz */
 	if (cardtype & MMC_HS_52MHZ)
 		mmc->card_caps |= MMC_MODE_HS_52MHz | MMC_MODE_HS;
@@ -913,7 +912,6 @@ int mmc_startup(struct mmc *mmc)
 			mmc_set_clock(mmc, 25000000);
 	} else {
 		if (mmc->card_caps & MMC_MODE_4BIT) {
-			printf("eMMC: 4bit\n");
 			/* Set the card to use 4 bit*/
 			err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL,
 					EXT_CSD_BUS_WIDTH,
@@ -924,7 +922,6 @@ int mmc_startup(struct mmc *mmc)
 
 			mmc_set_bus_width(mmc, 4);
 		} else if (mmc->card_caps & MMC_MODE_8BIT) {
-			printf("eMMC: 8bit\n");
 			/* Set the card to use 8 bit*/
 			err = mmc_switch(mmc, EXT_CSD_CMD_SET_NORMAL,
 					EXT_CSD_BUS_WIDTH,
@@ -937,12 +934,9 @@ int mmc_startup(struct mmc *mmc)
 		}
 
 		if (mmc->card_caps & MMC_MODE_HS) {
-			printf("eMMC: MODE_HS\n");
 			if (mmc->card_caps & MMC_MODE_HS_52MHz) {
-				printf("eMMC: MODE_HS_52Mhz\n");
 				mmc_set_clock(mmc, 52000000);
 			} else {
-				printf("eMMC: MODE_HS 26Mhz\n");
 				mmc_set_clock(mmc, 26000000);
 			}
 		} else {

@@ -237,12 +237,7 @@
 #endif
 
 #define CONFIG_BOOTDELAY	1
-#define CONFIG_BOOTCOMMAND	"dcache on; icache on; ubi part kernel 2048; ubifsmount kernel; ubifsload 80700000 uImage; bootm"
-#define CONFIG_BOOTARGS \
-		"console=ttyS0,115200n8 " \
-		"ubi.mtd=5,2048 root=ubi0:dingo-rootfs rootfstype=ubifs " \
-		"video=davincifb:osd0=320x240x16,2025K@0,0:osd1=320x240,2025K@0,0:vid0=off:vid1=off " \
-		"davinci_enc_mngr.ch0_mode=NON-STANDARD davinci_enc_mngr.ch0_output=LCD quiet lpj=671744"
+
 /*
 #define CONFIG_CMDLINE_EDITING
 #define CONFIG_VERSION_VARIABLE

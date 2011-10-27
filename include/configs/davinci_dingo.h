@@ -70,6 +70,7 @@
 #define PHYS_SDRAM_1_SIZE		(128 << 20)	/* 128 MiB */
 #define CONFIG_MAX_RAM_BANK_SIZE	(256 << 20)	/* Max supported */
 #define DDR_4BANKS
+#define BASELINE_LOADER_VERSION_ADDRESS	0x81000000
 
 /* Serial Driver info: UART0 for console  */
 #define CONFIG_SYS_NS16550

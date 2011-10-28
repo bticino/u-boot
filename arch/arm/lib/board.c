@@ -592,6 +592,7 @@ void board_init_r (gd_t *id, ulong dest_addr)
 	 * The baseline versione must be included in '<' and '>' chars
 	 * and not exceed 64 bytes size.
 	 */
+	s = getenv ("baselineloader_version");
 	uchar baselineloader[64];
 	uchar *ptr = BASELINE_LOADER_VERSION_ADDRESS;
 	int i;
@@ -607,7 +608,10 @@ void board_init_r (gd_t *id, ulong dest_addr)
 	} else
 		strcpy((char *)baselineloader, "BASELINE loader ver not known");
 
-	setenv ("baselineloader_version", (char *)baselineloader);
+	if ((s == NULL) || (strcmp(s, baselineloader))) {
+		setenv ("baselineloader_version", (char *)baselineloader);
+		saveenv ();
+	}
 #endif
 
 #ifdef CONFIG_BITBANGMII

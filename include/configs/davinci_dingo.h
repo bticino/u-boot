@@ -240,9 +240,10 @@
 
 /*
 #define CONFIG_CMDLINE_EDITING
-#define CONFIG_VERSION_VARIABLE
 #define CONFIG_TIMESTAMP
 */
+
+#define CONFIG_VERSION_VARIABLE
 
 /* U-Boot memory configuration */
 #define CONFIG_STACKSIZE               (256 << 10)     /* 256 KiB */
